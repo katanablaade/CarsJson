@@ -3,12 +3,16 @@ const select = document.getElementById('select-cars');
 const spanCar = document.querySelector('.span-car');
 const spanPrice = document.querySelector('.span-price');
 
-let arr = [];
+const arr = [];
 
 const getData = async () => {
-  const responseCars = await fetch('./cars.json');
-  const cars = await responseCars.json();
-  return cars;
+  try {
+    const responseCars = await fetch('./cars.json');
+    const cars = await responseCars.json();
+    return cars;
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
 const render = (cars) => {
@@ -25,13 +29,20 @@ const render = (cars) => {
   });
 };
 
-select.addEventListener('change', () => {
-  arr.forEach((car) => {
-    if (select.value === car.brand) {
-      spanCar.innerHTML = `Тачка ${car.brand} ${car.model}`;
-      spanPrice.innerHTML = `Цена: ${car.price}`;
+select.addEventListener('change', async () => {
+  try {
+    if (select.value !== 'Выбери тачку') {
+      const data = await getData();
+      data.cars.forEach((car) => {
+        if (select.value === car.brand) {
+          spanCar.innerHTML = `Тачка ${car.brand} ${car.model}`;
+          spanPrice.innerHTML = `Цена: ${car.price}`;
+        }
+      });
     }
-  });
+  } catch (error) {
+    console.warn(error);
+  }
 });
 
 getData().then((data) => {
